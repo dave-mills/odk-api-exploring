@@ -1,0 +1,62 @@
+---
+title: "Kobotools API example"
+output: html_notebook
+---
+
+
+To get the data from a specific form, you need the uid of the form. This is the long alphanumeric string in the url when you're looking at the form on Kobotools.
+
+E.g: https://kf.kobotoolbox.org/#/forms/aB3QNqHH9UspsyaU4cpwva/summary
+Here, the uid = aB3QNqHH9UspsyaU4cpwva
+
+This is updated to use the "data" endpoint, documented at https://kf.kobotoolbox.org/api/v2/
+Previously, we used the "https://kf.kobotoolbox.org/assets/#####/submissions" url, which is not officially documented (but might be in the future...?)
+
+
+```{r}
+library(httr)
+library(jsonlite)
+
+### Unpack config file 
+# This file should be json file in the following format:
+# { 
+#    "username": ""
+#    "password": ""
+#    "form_uid": ""
+# }
+
+config <- fromJSON('config.json')
+
+# Add the Form UID here
+form_uid <- config$form_uid
+kpi_url <- "https://kf.kobotoolbox.org/api/v2/assets"
+
+# Update these with your Kobo ID and username
+user = config$username
+password = config$password
+
+
+resp <- GET(
+                paste(kpi_url, form_uid, "data", sep="/"),
+                authenticate(user, password),
+                content_type("text/json"),
+                accept_json()
+)
+
+## Get the data out of the response in a helpful way
+# Raw text string (json)
+dataAsText <- content(resp, as="text")
+
+# Set of R Vectors / Lists
+dataAsLists <- content(resp, as="parsed")
+
+# get just the data, not the pagination metadata
+dataAsLists <- dataAsLists$results
+
+
+# As a dataframe (I assume this is the most useful??)
+dataAsFrame <- fromJSON(dataAsText)
+dataAsFrame <- dataAsFrame$results
+
+```
+
