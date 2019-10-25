@@ -14,12 +14,12 @@ data_url = 'https://kf.kobotoolbox.org/api/v2/assets'
 
 
 # Add the form id here
-form_id = config['kobo_form_id']
+form_uid = config['form_uid']
 
 headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
 
-response = requests.get('%s/%s/data' % (data_url,form_id),
+response = requests.get('%s/%s/data' % (data_url,form_uid),
                         headers=headers,
                         auth=(username,password)
                         );
